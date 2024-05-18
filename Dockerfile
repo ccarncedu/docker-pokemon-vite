@@ -13,6 +13,10 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Remove node_modules and package-lock.json and reinstall dependencies
+RUN rm -rf node_modules package-lock.json
+RUN npm install
+
 # Build the application
 RUN npm run build
 
