@@ -1,73 +1,40 @@
 import { useState } from 'react';
+import { usePokemonTeam } from '../../context/PokemonTeamContext';
 
 interface Pokemon {
-  id: number;
+  id: string; // Atualize para string
   name: string;
   types: string[];
-}
-
-interface PokemonAPIResponse {
-    id: number;
-    name: string;
-    types: { type: { name: string } }[];
+  image: string;
 }
 
 export default function PokemonTeam() {
-  const [team, setTeam] = useState<Pokemon[]>([]);
-  const [pokemonId, setPokemonId] = useState<number | null>(null);
-
-  const addPokemonToTeam = (pokemon: Pokemon) => {
-    if (team.length < 5 && !team.some(p => p.id === pokemon.id)) {
-      setTeam([...team, pokemon]);
-    } else {
-      alert('O time já está completo ou o Pokémon já está no time.');
-    }
-  };
-
-  const removePokemonFromTeam = (id: number) => {
-    setTeam(team.filter(p => p.id !== id));
-  };
-
-  const handleAddPokemon = async () => {
-    if (pokemonId) {
-      try {
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
-        const data: PokemonAPIResponse = await response.json();
-        const pokemon: Pokemon = {
-          id: data.id,
-          name: data.name,
-          types: data.types.map(typeInfo => typeInfo.type.name),
-        };
-        addPokemonToTeam(pokemon);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.error('Erro ao buscar o Pokémon:', error.message);
-        } else {
-          console.error('Erro ao buscar o Pokémon:', error);
-        }
-      }
-    } else {
-      alert('Por favor, insira um ID de Pokémon válido.');
-    }
-  };
+  const { pokemons, pokemonTeam: team, addPokemon, removePokemon } = usePokemonTeam() as { pokemons: Pokemon[]; pokemonTeam: Pokemon[]; addPokemon: (pokemon: Pokemon) => void; removePokemon: (id: string) => void; };
+  const [pokemonId, setPokemonId] = useState<string | null>(null); // Atualize para string
 
   return (
     <div>
       <h2>Seu Time de Pokémon</h2>
       <input
-        type="number"
+        type="text" // Atualize para text
         placeholder="Digite o ID do Pokémon"
         value={pokemonId ?? ''}
-        onChange={(e) => setPokemonId(Number(e.target.value))}
+        onChange={(e) => setPokemonId(e.target.value)} 
       />
-      <button onClick={handleAddPokemon}>Adicionar ao Time</button>
+      <button onClick={() => {
+        const pokemonToAdd = pokemons.find((p: { id: string; }) => p.id === pokemonId);
+        if (pokemonToAdd) {
+          addPokemon(pokemonToAdd); 
+        }
+      }}>Adicionar ao Time</button>
       <ul>
-        {team.map((pokemon) => (
-          <li key={pokemon.id}>
-            {pokemon.name} - {pokemon.types.join(', ')}
-            <button onClick={() => removePokemonFromTeam(pokemon.id)}>Remover</button>
-          </li>
-        ))}
+      {team.map((pokemon: Pokemon) => (
+        <li key={pokemon.id}>
+          <img src={pokemon.image} alt={pokemon.name} />
+          {pokemon.name} - {pokemon.types.join(', ')}
+          <button onClick={() => removePokemon(pokemon.id)}>Remover</button> {/* Use a função removePokemon do contexto */}
+        </li>
+      ))}
       </ul>
     </div>
   );
