@@ -18,7 +18,7 @@ docker-compose up
 
 
 
-**Parar os container**
+**Parar os containers**
 
 
 
