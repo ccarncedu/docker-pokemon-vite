@@ -3,6 +3,9 @@ Para rodar o projeto, utilize os seguintes comandos:
 
 
 **Buildar os containers**
+
+
+
 docker-compose build
 
 
