@@ -26,7 +26,7 @@ docker-compose down
 
 
 
-**Ir para local, para após o container ter sido iniciado**
+**Ir para local, após o container ter sido iniciado**
 
 
 
